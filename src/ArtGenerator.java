@@ -1,9 +1,13 @@
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class ArtGenerator {
+    public static final String ANSI_GREEN = "\u001B[32m";
+
     public static void main(String[] args)throws Exception {
         boolean averageBright = false;
         boolean luminosity = false;
@@ -19,6 +23,25 @@ public class ArtGenerator {
                 System.out.println("No correct input detected, try again.");
             }
         }
+        boolean invertColors = false;
+        while(true){
+            System.out.println("Do you want to invert the colors? Y - yes, N - no");
+            String answer = scanner.nextLine();
+            if(answer.equalsIgnoreCase("Y") || answer.equalsIgnoreCase("N")){
+                if(answer.equalsIgnoreCase("Y")){
+                    invertColors = true;
+                    break;
+                }
+                else {
+                    invertColors = false;
+                    break;
+                }
+            }
+            else {
+                System.out.println("No correct input detected, try again.");
+            }
+        }
+
         File image = new File("C:\\Users\\aauza\\Desktop\\Java\\IdeaProjects\\Tutorials\\ASCII-ArtGenerator\\NewTestImage.jpg");
         BufferedImage img = ImageIO.read(image);
         if(img == null){
@@ -27,6 +50,12 @@ public class ArtGenerator {
         System.out.println("Successfully loaded image!");
         int width = img.getWidth();
         int height = img.getHeight();
+        System.out.println("Image is " + width + "x" + height);
+        if(width > 160 && height > 120){
+            img = resizeImage(img, 160, 120);
+        }
+        width = img.getWidth();
+        height = img.getHeight();
         System.out.println("Image is " + width + "x" + height);
 
         RGBPixel[][] pixelsAsRGB = new RGBPixel[height][width];
@@ -43,9 +72,15 @@ public class ArtGenerator {
                 int blue = pixelsAsRGB[y][x].getBlue();
                 if(averageBright) {
                     int average = Math.round(red + green + blue) / 3;
+                    if(invertColors){
+                        average = 255 - average;
+                    }
                     brightnessPixels[y][x] = average;
                 } else if(luminosity){
                     int pixel = (int) Math.round(0.21 * red + 0.72 * green + 0.07 * blue);
+                    if(invertColors){
+                        pixel = 255 - pixel;
+                    }
                     brightnessPixels[y][x] = pixel;
 
                 }
@@ -56,9 +91,11 @@ public class ArtGenerator {
 //      Using the string below :
 //      "`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
 //      I must map the corresponding character to that brightness amount.
-        String charMatrix = "`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
+//        String charMatrix = "`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
+        String charMatrix = ("    ,';-");
+//        String charMatrix = ("    .;");
         int length = charMatrix.length();
-        double range = 255 / (double) length;
+        double range = 256 / (double) length;
         char[][] finalPixels = new char[height][width];
         for(int y = 0; y < height; y++){
             for(int x = 0; x < width; x++){
@@ -81,9 +118,9 @@ public class ArtGenerator {
 //                writer.print(finalPixels[y][x]);
 //                writer.print(finalPixels[y][x]);
 //                writer.print(finalPixels[y][x]);
-                System.out.print(finalPixels[y][x]);
-//                System.out.print(finalPixels[y][x]);
-//                System.out.print(finalPixels[y][x]);
+                System.out.print(ANSI_GREEN + finalPixels[y][x] + ANSI_GREEN);
+                System.out.print(ANSI_GREEN + finalPixels[y][x] + ANSI_GREEN);
+                System.out.print(ANSI_GREEN + finalPixels[y][x] + ANSI_GREEN);
             }
 
 //            writer.println();
@@ -106,5 +143,12 @@ public class ArtGenerator {
             }
         }
         return array;
+    }
+
+    public static BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException {
+        Image resultingImage = originalImage.getScaledInstance(targetWidth,targetHeight,Image.SCALE_DEFAULT);
+        BufferedImage outputImage = new BufferedImage(targetWidth,targetHeight,BufferedImage.TYPE_INT_RGB);
+        outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
+        return outputImage;
     }
     }
