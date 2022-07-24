@@ -12,6 +12,16 @@ public class ArtGenerator {
         boolean averageBright = false;
         boolean luminosity = false;
         Scanner scanner = new Scanner(System.in);
+        String directory;
+        while(true) {
+            System.out.println("Enter absolute directory of image file.");
+            directory = scanner.nextLine();
+            if(!directory.toLowerCase().endsWith(".jpg") && !directory.toLowerCase().endsWith(".jpeg")){
+                System.out.println("Wrong format file detected. Only JPG and JPEG files supported.");
+            } else {
+                break;
+            }
+        }
         while(!averageBright && !luminosity) {
             System.out.println("Average or Luminosity brightness mapping? Type 1 for average, 2 for luminosity");
             int number = scanner.nextInt();
@@ -23,7 +33,8 @@ public class ArtGenerator {
                 System.out.println("No correct input detected, try again.");
             }
         }
-        boolean invertColors = false;
+        scanner.nextLine();
+        boolean invertColors;
         while(true){
             System.out.println("Do you want to invert the colors? Y - yes, N - no");
             String answer = scanner.nextLine();
@@ -41,8 +52,7 @@ public class ArtGenerator {
                 System.out.println("No correct input detected, try again.");
             }
         }
-
-        File image = new File("C:\\Users\\aauza\\Desktop\\Java\\IdeaProjects\\Tutorials\\ASCII-ArtGenerator\\NewTestImage.jpg");
+        File image = new File(directory);
         BufferedImage img = ImageIO.read(image);
         if(img == null){
             throw new NullPointerException("Something went wrong with loading image.");
@@ -50,13 +60,13 @@ public class ArtGenerator {
         System.out.println("Successfully loaded image!");
         int width = img.getWidth();
         int height = img.getHeight();
-        System.out.println("Image is " + width + "x" + height);
+//        System.out.println("Image is " + width + "x" + height);
         if(width > 160 && height > 120){
             img = resizeImage(img, 160, 120);
         }
         width = img.getWidth();
         height = img.getHeight();
-        System.out.println("Image is " + width + "x" + height);
+//        System.out.println("Image is " + width + "x" + height);
 
         RGBPixel[][] pixelsAsRGB = new RGBPixel[height][width];
 //      Create a 2D array of pixels, that holds the rgb values for each pixel.
